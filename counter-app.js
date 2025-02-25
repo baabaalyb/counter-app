@@ -13,71 +13,139 @@ import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
  * @element counter-app
  */
 export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
-
   static get tag() {
     return "counter-app";
   }
 
   constructor() {
     super();
-    this.title = "";
-    this.t = this.t || {};
-    this.t = {
-      ...this.t,
-      title: "Title",
-    };
-    this.registerLocalization({
-      context: this,
-      localesPath:
-        new URL("./locales/counter-app.ar.json", import.meta.url).href +
-        "/../",
-      locales: ["ar", "es", "hi", "zh"],
-    });
+    this.count = 0;
+    this.min = 0;
+    this.max = 10;
   }
 
-  // Lit reactive properties
   static get properties() {
     return {
       ...super.properties,
-      title: { type: String },
+      count: { type: Number, reflect: true },
+      min: { type: Number, reflect: true },
+      max: { type: Number, reflect: true },
     };
   }
 
-  // Lit scoped styles
   static get styles() {
-    return [super.styles,
-    css`
-      :host {
-        display: block;
-        color: var(--ddd-theme-primary);
-        background-color: var(--ddd-theme-accent);
-        font-family: var(--ddd-font-navigation);
-      }
-      .wrapper {
-        margin: var(--ddd-spacing-2);
-        padding: var(--ddd-spacing-4);
-      }
-      h3 span {
-        font-size: var(--counter-app-label-font-size, var(--ddd-font-size-s));
-      }
-    `];
+    return [
+      super.styles,
+      css`
+        :host {
+          display: block;
+          color: var(--ddd-theme-primary);
+          background-color: var(--ddd-theme-accent);
+          font-family: var(--ddd-font-navigation);
+          padding: var(--ddd-spacing-2);
+          border: var(--ddd-border-md);
+          border-radius: var(--ddd-radius-lg);
+        }
+
+        .wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center; /* Center horizontally */
+          padding: var(--ddd-spacing-4);
+        }
+
+        .counter {
+          font-size: var(--counter-app-label-font-size, var(--ddd-font-size-xxl));
+          margin-bottom: var(--ddd-spacing-2);
+          color: var(--ddd-theme-primary); /* Default color */
+        }
+
+        .buttons {
+          display: flex;
+          gap: var(--ddd-spacing-1); /* Spacing between buttons */
+        }
+
+        button {
+          padding: var(--ddd-spacing-2);
+          cursor: pointer;
+          font-size: var(--ddd-font-size-m);
+          background-color: var(--ddd-theme-default-skyLight);
+          border: none; /* Remove default border */
+          border-radius: var(--ddd-radius-sm); /* Rounded corners */
+        }
+
+        button:hover {
+          background-color: var(--ddd-theme-default-creekTeal);
+        }
+
+        button:focus {
+          background-color: var(--ddd-theme-default-keystoneYellow);
+        }
+
+        button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        :host([count="18"]) .counter {
+          color: var(--ddd-theme-default-athertonViolet);
+        }
+
+        :host([count="21"]) .counter {
+          color: var(--ddd-theme-default-athertonViolet);
+        }
+
+        :host([count] = "${this.min}") .counter,
+        :host([count] = "${this.max}") .counter {
+          color: var(--ddd-theme-default-athertonViolet);
+        }
+      `,
+    ];
   }
 
-  // Lit render the HTML
   render() {
     return html`
-<div class="wrapper">
-  <h3><span>${this.t.title}:</span> ${this.title}</h3>
-  <slot></slot>
-</div>`;
+      <confetti-container id="confetti" class="wrapper">
+        <div class="counter">${this.count}</div>
+        <div class="buttons">
+          <button @click="${this.decrease}" ?disabled="${this.count <= this.min}">-</button>
+          <button @click="${this.increase}" ?disabled="${this.count >= this.max}">+</button>
+        </div>
+      </confetti-container>
+    `;
   }
 
-  /**
-   * haxProperties integration via file reference
-   */
+  increase() {
+    if (this.count < this.max) {
+      this.count++;
+    }
+  }
+
+  decrease() {
+    if (this.count > this.min) {
+      this.count--;
+    }
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+    if (changedProperties.has('count')) {
+      if (this.count === 21) {
+        this.makeItRain();
+      }
+    }
+  }
+
+  makeItRain() {
+    import("@haxtheweb/multiple-choice/lib/confetti-container.js").then((module) => {
+      setTimeout(() => {
+        this.shadowRoot.querySelector("#confetti").setAttribute("popped", "");
+      }, 0);
+    });
+  }
+
   static get haxProperties() {
-    return new URL(`./lib/${this.tag}.haxProperties.json`, import.meta.url)
-      .href;
+    return new URL(`./lib/${this.tag}.haxProperties.json`, import.meta.url).href;
   }
 }
 
