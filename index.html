@@ -1,94 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    </head>
-<body>
+  <base href="/">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="Description" content="Demonstration for counter-app">
 
-<script>
-    class MyCard extends HTMLElement {
-        constructor() {
-            super();
-            const shadow = this.attachShadow({ mode: 'open' });
-
-            // Create elements
-            const image = document.createElement('img');
-            image.src = this.dataset.image;
-            image.alt = this.dataset.title;
-
-            const content = document.createElement('div');
-            content.classList.add('card-content');
-
-            const title = document.createElement('h3');
-            title.textContent = this.dataset.title;
-
-            const description = document.createElement('p');
-            description.textContent = this.dataset.description;
-
-            const listTitle = document.createElement('h4');
-            listTitle.textContent = "The goals";
-            const list = document.createElement('ul');
-            const listItems = JSON.parse(this.dataset.list);
-            listItems.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                list.appendChild(li);
-            });
-
-            const linksTitle = document.createElement('h4');
-            linksTitle.textContent = "Places to learn more";
-            const links = document.createElement('ul');
-            const linkItems = JSON.parse(this.dataset.links);
-            linkItems.forEach(linkData => {
-                const li = document.createElement('li');
-                const a = document.createElement('a');
-                a.href = linkData.href;
-                a.textContent = linkData.text;
-                li.appendChild(a);
-                links.appendChild(li);
-            });
-
-            // Apply styles from CSS variables
-            const style = document.createElement('style');
-            style.textContent = `
-                :host {
-                    background-color: var(--card-bg-color, purple);
-                }
-                .card-content {
-                    background-color: var(--content-bg-color, white);
-                }
-                h3 {
-                    background-color: var(--title-bg-color, #9A4EAE);
-                }
-            `;
-
-            // Attach elements to the shadow DOM
-            shadow.appendChild(style);
-            shadow.appendChild(image);
-            content.appendChild(title);
-            content.appendChild(description);
-            content.appendChild(listTitle);
-            content.appendChild(list);
-            content.appendChild(linksTitle);
-            content.appendChild(links);
-            shadow.appendChild(content);
-        }
-
-        // Handle attribute changes (optional)
-        attributeChangedCallback(name, oldValue, newValue) {
-            if (name === 'data-image') {
-                this.shadowRoot.querySelector('img').src = newValue;
-            } else if (name === 'data-title') {
-                this.shadowRoot.querySelector('h3').textContent = newValue;
-            } // Add more attribute change handling as needed
-        }
-
-        static get observedAttributes() {
-            return ['data-image', 'data-title']; // Add other attributes you want to observe
-        }
+  <style>
+    :root,
+    html,
+    body {
+      margin: 0;
+      padding: 0;
     }
 
-    customElements.define('my-card', MyCard);
-</script>
+    #demo {
+      margin: var(--ddd-spacing-2);
+    }
 
+    counter-app {
+      margin: var(--ddd-spacing-2);
+      border: var(--ddd-border-md);
+      border-radius: var(--ddd-radius-lg);
+    }
+
+    counter-app:hover {
+      box-shadow: var(--ddd-boxShadow-sm);
+    }
+  </style>
+  <title>Counter App</title>
+</head>
+
+<body>
+  <div id="demo">
+    <h1>Counter App</h1>
+    <h2>Default Instance</h2>
+    <counter-app></counter-app>
+    <h2>Instance with Properties</h2>
+    <counter-app count="16" min="10" max="25"></counter-app>
+  </div>
+ 
+  <script type="module" src="./counter-app.js"></script>
 </body>
+
 </html>
